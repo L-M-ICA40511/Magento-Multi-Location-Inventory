@@ -42,8 +42,11 @@ class Demac_MultiLocationInventory_Model_CatalogInventory_Stock extends Mage_Cat
                 //@TODO load isQtyDecimal and set it properly.
                 $stockItem->setIsQtyDecimal(false);
                 $product->setStockItem($stockItem);
-                $product->setIsInStock((bool) $stockItems[$product->getId()]->getIsInStock());
-                $product->setIsSalable((bool) $stockItems[$product->getId()]->getIsInStock());
+                $isInStock = (bool) $stockItems[$product->getId()]->getIsInStock();
+                $product->setIsInStock($isInStock);
+                if (!$isInStock) {
+                    $product->setIsSalable(false);
+                }
             }
         }
 
