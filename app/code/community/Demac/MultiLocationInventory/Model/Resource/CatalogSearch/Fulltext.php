@@ -52,6 +52,17 @@ class Demac_MultiLocationInventory_Model_Resource_CatalogSearch_Fulltext extends
         $select->where('e.entity_id>?', $lastProductId)
             ->limit($limit)
             ->order('e.entity_id');
+
+        /**
+         * Add additional external limitation
+         */
+        Mage::dispatchEvent('prepare_catalog_product_index_select', array(
+            'select'        => $select,
+            'entity_field'  => new Zend_Db_Expr('e.entity_id'),
+            'website_field' => new Zend_Db_Expr('website.website_id'),
+            'store_field'   => $storeId
+        ));
+
         $result = $writeAdapter->fetchAll($select);
         return $result;
     }
