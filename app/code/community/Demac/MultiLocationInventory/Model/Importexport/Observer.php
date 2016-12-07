@@ -67,7 +67,7 @@ class Demac_MultiLocationInventory_Model_Importexport_Observer
     {
         /** @var Mage_ImportExport_Model_Import_Entity_Product $adapter */
         $adapter = $observer->getData('adapter');
-        if(!$adapter) {
+        if(!$adapter || !$adaptor instanceof Mage_ImportExport_Model_Import_Entity_Product) {
             return $this;
         }
 
