@@ -4,21 +4,21 @@ $installer = $this;
 $installer->startSetup();
 
 
-$sql = '
+$sql = <<<SQL
 DROP PROCEDURE IF EXISTS `DEMAC_MLI_REINDEX_SET`;
 CREATE PROCEDURE `DEMAC_MLI_REINDEX_SET` (reindex_entity_ids TEXT)
 BEGIN
   UPDATE demac_multilocationinventory_stock_status_index dest, 
        (SELECT stock.product_id                                      AS 
                product_id, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum( 
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, 
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS 
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                stores.store_id                                       AS store_id 
         FROM   demac_multilocationinventory_stock AS stock 
@@ -29,20 +29,20 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores 
                  ON stock.location_id = stores.location_id 
         WHERE  location.status = 1 
-               AND product_entity.type_id IN ("simple", "giftcard")
+               AND product_entity.type_id IN ('simple', 'giftcard')
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
-        GROUP  BY Concat(stores.store_id, "_", stock.product_id) 
+        GROUP  BY Concat(stores.store_id, '_', stock.product_id) 
         UNION 
         SELECT stock.product_id                                      AS 
                product_id, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum( 
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, 
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS 
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                0                                                     AS store_id 
         FROM   demac_multilocationinventory_stock AS stock 
@@ -51,18 +51,18 @@ BEGIN
                JOIN catalog_product_entity AS product_entity 
                  ON stock.product_id = product_entity.entity_id 
         WHERE  location.status = 1 
-               AND product_entity.type_id IN ("simple", "giftcard")
+               AND product_entity.type_id IN ('simple', 'giftcard')
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
         GROUP  BY stock.product_id 
         UNION 
         SELECT product_entity.entity_id 
                AS product_id, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF( 
                Sum(IF(stock.is_in_stock = 
                       1, stock.qty, 0)) 
                AND 
                Sum(stock.is_in_stock) > 0, 1, 0))                    AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF( 
                Sum(IF(stock.is_in_stock = 
                       1, stock.qty, 0)) 
                AND 
@@ -70,7 +70,7 @@ BEGIN
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock,
                stores.store_id                                       AS store_id
         FROM   catalog_product_entity AS product_entity 
@@ -83,18 +83,18 @@ BEGIN
                JOIN demac_multilocationinventory_location AS location 
                  ON stock.location_id = location.id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "configurable"
+               AND product_entity.type_id = 'configurable'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
-        GROUP  BY Concat(stores.store_id, "_", product_entity.entity_id) 
+        GROUP  BY Concat(stores.store_id, '_', product_entity.entity_id) 
         UNION 
         SELECT product_entity.entity_id 
                AS product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF( 
                Sum(IF(stock.is_in_stock = 
                       1, stock.qty, 0)) 
                AND 
                Sum(stock.is_in_stock) > 0, 1, 0))                    AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF( 
                Sum(IF(stock.is_in_stock = 
                       1, stock.qty, 0)) 
                AND 
@@ -102,7 +102,7 @@ BEGIN
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock,
                0                                                     AS store_id
         FROM   catalog_product_entity AS product_entity 
@@ -113,7 +113,7 @@ BEGIN
                JOIN demac_multilocationinventory_location AS location 
                  ON stock.location_id = location.id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "configurable"
+               AND product_entity.type_id = 'configurable'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
         GROUP  BY product_entity.entity_id 
         UNION 
@@ -126,7 +126,7 @@ BEGIN
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                stores.store_id                                       AS store_id 
         FROM   catalog_product_entity AS product_entity 
@@ -139,9 +139,9 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores 
                  ON stock.location_id = stores.location_id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "grouped"
+               AND product_entity.type_id = 'grouped'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
-        GROUP  BY Concat(stores.store_id, "_", product_entity.entity_id) 
+        GROUP  BY Concat(stores.store_id, '_', product_entity.entity_id) 
         UNION 
         SELECT product_entity.entity_id                              AS 
                product_id, 
@@ -152,7 +152,7 @@ BEGIN
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                0                                                     AS store_id 
         FROM   catalog_product_entity AS product_entity 
@@ -163,20 +163,20 @@ BEGIN
                JOIN demac_multilocationinventory_location AS location 
                  ON stock.location_id = location.id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "grouped"
+               AND product_entity.type_id = 'grouped'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
         GROUP  BY product_entity.entity_id 
         UNION 
         SELECT stock.product_id                                      AS 
                product_id, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum( 
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, 
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS 
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                stores.store_id                                       AS store_id 
         FROM   demac_multilocationinventory_stock AS stock 
@@ -187,20 +187,20 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores 
                  ON stock.location_id = stores.location_id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "virtual"
+               AND product_entity.type_id = 'virtual'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids) 
-        GROUP  BY Concat(stores.store_id, "_", stock.product_id) 
+        GROUP  BY Concat(stores.store_id, '_', stock.product_id) 
         UNION 
         SELECT stock.product_id                                      AS 
                product_id, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum( 
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, 
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS 
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                0                                                     AS store_id 
         FROM   demac_multilocationinventory_stock AS stock 
@@ -209,20 +209,20 @@ BEGIN
                JOIN catalog_product_entity AS product_entity 
                  ON stock.product_id = product_entity.entity_id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "virtual"
+               AND product_entity.type_id = 'virtual'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
         GROUP  BY stock.product_id 
         UNION 
         SELECT stock.product_id                                      AS 
                product_id, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum( 
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, 
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS 
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                stores.store_id                                       AS store_id 
         FROM   demac_multilocationinventory_stock AS stock 
@@ -233,20 +233,20 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores 
                  ON stock.location_id = stores.location_id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "downloadable"
+               AND product_entity.type_id = 'downloadable'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
-        GROUP  BY Concat(stores.store_id, "_", stock.product_id) 
+        GROUP  BY Concat(stores.store_id, '_', stock.product_id) 
         UNION 
         SELECT stock.product_id                                      AS 
                product_id, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum( 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum( 
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, 
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS 
                is_in_stock, 
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS 
                backorders, 
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS 
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS 
                manage_stock, 
                0                                                     AS store_id 
         FROM   demac_multilocationinventory_stock AS stock 
@@ -255,7 +255,7 @@ BEGIN
                JOIN catalog_product_entity AS product_entity 
                  ON stock.product_id = product_entity.entity_id 
         WHERE  location.status = 1 
-               AND product_entity.type_id = "downloadable"
+               AND product_entity.type_id = 'downloadable'
                AND FIND_IN_SET(product_entity.entity_id, reindex_entity_ids)
         GROUP  BY stock.product_id) src 
 SET    dest.qty = src.qty, 
@@ -265,24 +265,24 @@ SET    dest.qty = src.qty,
 WHERE  dest.store_id = src.store_id 
        AND dest.product_id = src.product_id;
 END;
-';
+SQL;
 
 
-$sql2 = '
+$sql2 = <<<SQL
 DROP PROCEDURE IF EXISTS `DEMAC_MLI_REINDEX_ALL`;
 CREATE PROCEDURE `DEMAC_MLI_REINDEX_ALL` ()
 BEGIN
   UPDATE demac_multilocationinventory_stock_status_index dest,
        (SELECT stock.product_id                                      AS
                product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum(
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1,
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1,
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                stores.store_id                                       AS store_id
         FROM   demac_multilocationinventory_stock AS stock
@@ -293,19 +293,19 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores
                  ON stock.location_id = stores.location_id
         WHERE  location.status = 1
-               AND product_entity.type_id IN ("simple", "giftcard")
-        GROUP  BY Concat(stores.store_id, "_", stock.product_id)
+               AND product_entity.type_id IN ('simple', 'giftcard')
+        GROUP  BY Concat(stores.store_id, '_', stock.product_id)
         UNION
         SELECT stock.product_id                                      AS
                product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum(
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1,
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1,
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                0                                                     AS store_id
         FROM   demac_multilocationinventory_stock AS stock
@@ -314,17 +314,17 @@ BEGIN
                JOIN catalog_product_entity AS product_entity
                  ON stock.product_id = product_entity.entity_id
         WHERE  location.status = 1
-               AND product_entity.type_id IN ("simple", "giftcard")
+               AND product_entity.type_id IN ('simple', 'giftcard')
         GROUP  BY stock.product_id
         UNION
         SELECT product_entity.entity_id
                AS product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF(
                Sum(IF(stock.is_in_stock =
                       1, stock.qty, 0))
                AND
                Sum(stock.is_in_stock) > 0, 1, 0))                    AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF(
                Sum(IF(stock.is_in_stock =
                       1, stock.qty, 0))
                AND
@@ -332,7 +332,7 @@ BEGIN
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                stores.store_id                                       AS store_id
         FROM   catalog_product_entity AS product_entity
@@ -345,17 +345,17 @@ BEGIN
                JOIN demac_multilocationinventory_location AS location
                  ON stock.location_id = location.id
         WHERE  location.status = 1
-               AND product_entity.type_id = "configurable"
-        GROUP  BY Concat(stores.store_id, "_", product_entity.entity_id)
+               AND product_entity.type_id = 'configurable'
+        GROUP  BY Concat(stores.store_id, '_', product_entity.entity_id)
         UNION
         SELECT product_entity.entity_id
                AS product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF(
                Sum(IF(stock.is_in_stock =
                       1, stock.qty, 0))
                AND
                Sum(stock.is_in_stock) > 0, 1, 0))                    AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, IF(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, IF(
                Sum(IF(stock.is_in_stock =
                       1, stock.qty, 0))
                AND
@@ -363,7 +363,7 @@ BEGIN
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                0                                                     AS store_id
         FROM   catalog_product_entity AS product_entity
@@ -374,7 +374,7 @@ BEGIN
                JOIN demac_multilocationinventory_location AS location
                  ON stock.location_id = location.id
         WHERE  location.status = 1
-               AND product_entity.type_id = "configurable"
+               AND product_entity.type_id = 'configurable'
         GROUP  BY product_entity.entity_id
         UNION
         SELECT product_entity.entity_id                              AS
@@ -386,7 +386,7 @@ BEGIN
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                stores.store_id                                       AS store_id
         FROM   catalog_product_entity AS product_entity
@@ -399,8 +399,8 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores
                  ON stock.location_id = stores.location_id
         WHERE  location.status = 1
-               AND product_entity.type_id = "grouped"
-        GROUP  BY Concat(stores.store_id, "_", product_entity.entity_id)
+               AND product_entity.type_id = 'grouped'
+        GROUP  BY Concat(stores.store_id, '_', product_entity.entity_id)
         UNION
         SELECT product_entity.entity_id                              AS
                product_id,
@@ -411,7 +411,7 @@ BEGIN
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                0                                                     AS store_id
         FROM   catalog_product_entity AS product_entity
@@ -422,19 +422,19 @@ BEGIN
                JOIN demac_multilocationinventory_location AS location
                  ON stock.location_id = location.id
         WHERE  location.status = 1
-               AND product_entity.type_id = "grouped"
+               AND product_entity.type_id = 'grouped'
         GROUP  BY product_entity.entity_id
         UNION
         SELECT stock.product_id                                      AS
                product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum(
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1,
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1,
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                stores.store_id                                       AS store_id
         FROM   demac_multilocationinventory_stock AS stock
@@ -445,19 +445,19 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores
                  ON stock.location_id = stores.location_id
         WHERE  location.status = 1
-               AND product_entity.type_id = "virtual"
-        GROUP  BY Concat(stores.store_id, "_", stock.product_id)
+               AND product_entity.type_id = 'virtual'
+        GROUP  BY Concat(stores.store_id, '_', stock.product_id)
         UNION
         SELECT stock.product_id                                      AS
                product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum(
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1,
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1,
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                0                                                     AS store_id
         FROM   demac_multilocationinventory_stock AS stock
@@ -466,19 +466,19 @@ BEGIN
                JOIN catalog_product_entity AS product_entity
                  ON stock.product_id = product_entity.entity_id
         WHERE  location.status = 1
-               AND product_entity.type_id = "virtual"
+               AND product_entity.type_id = 'virtual'
         GROUP  BY stock.product_id
         UNION
         SELECT stock.product_id                                      AS
                product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum(
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1,
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1,
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                stores.store_id                                       AS store_id
         FROM   demac_multilocationinventory_stock AS stock
@@ -489,19 +489,19 @@ BEGIN
                JOIN demac_multilocationinventory_stores AS stores
                  ON stock.location_id = stores.location_id
         WHERE  location.status = 1
-               AND product_entity.type_id = "downloadable"
-        GROUP  BY Concat(stores.store_id, "_", stock.product_id)
+               AND product_entity.type_id = 'downloadable'
+        GROUP  BY Concat(stores.store_id, '_', stock.product_id)
         UNION
         SELECT stock.product_id                                      AS
                product_id,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1, Sum(
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1, Sum(
                IF(stock.is_in_stock = 1, stock.qty, 0)))             AS qty,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 1,
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 1,
                IF(Sum(stock.is_in_stock) > 0, 1, 0))                 AS
                is_in_stock,
                IF(Sum(stock.backorders) > 0, 1, 0)                   AS
                backorders,
-               IF(Group_concat(stock.manage_stock) LIKE "%0%", 0, 1) AS
+               IF(Group_concat(stock.manage_stock) LIKE '%0%', 0, 1) AS
                manage_stock,
                0                                                     AS store_id
         FROM   demac_multilocationinventory_stock AS stock
@@ -510,7 +510,7 @@ BEGIN
                JOIN catalog_product_entity AS product_entity
                  ON stock.product_id = product_entity.entity_id
         WHERE  location.status = 1
-               AND product_entity.type_id = "downloadable"
+               AND product_entity.type_id = 'downloadable'
         GROUP  BY stock.product_id) src
 SET    dest.qty = src.qty,
        dest.is_in_stock = src.is_in_stock,
@@ -519,7 +519,7 @@ SET    dest.qty = src.qty,
 WHERE  dest.store_id = src.store_id
        AND dest.product_id = src.product_id;
 END;
-';
+SQL;
 
 $write = Mage::getSingleton('core/resource')->getConnection('core_write');
 $write->exec($sql);
