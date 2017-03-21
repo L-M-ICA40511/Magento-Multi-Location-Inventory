@@ -11,7 +11,19 @@
  */
 class Demac_MultiLocationInventory_Model_Stock extends Mage_Core_Model_Abstract
 {
+    /**
+     * Model event prefix
+     *
+     * @var string
+     */
     protected $_eventPrefix = 'demac_multilocationinventory_stock';
+
+    /**
+     * Name of the event object
+     *
+     * @var string
+     */
+    protected $_eventObject = 'stock_item';
 
     /**
      * Init
