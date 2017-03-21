@@ -6,6 +6,20 @@
 class Demac_MultiLocationInventory_Model_Resource_Location_Collection extends Mage_Core_Model_Resource_Db_Collection_Abstract
 {
     /**
+     * Event prefix
+     *
+     * @var string
+     */
+    protected $_eventPrefix    = 'multilocationinventory_location_collection';
+    
+    /**
+     * Name of the event object
+     *
+     * @var string
+     */
+    protected $_eventObject    = 'location_collection';
+    
+    /**
      * Init collection
      */
     protected function _construct()
